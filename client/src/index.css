@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+    --primary: #D41414;
+    --black: #000;
+    --white: #fff;
+    --text: #888;
+}
+
+body {
+    color: var(--white);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--black);
+}
+
+p {
+    color: var(--text);
+    font-size: 14px;
+}
+
+header {
+    background-color: var(--primary);
+}
+
+header .active {
+    color: var(--black);
+}
+
+.logo a {
+    color: var(--white);
+}
+
+.links a {
+    position: relative;
+}
+
+.links a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 1px;
+    background-color: var(--white);
+    bottom: -2px;
+    left: 0;
+    transition: width 0.3s ease-in-out;
+}
+
+.links a:hover::after {
+    width: 100%;
+}
+
+.dropdown {
+    background-color: #a81212;
+    overflow: hidden;
+}
+
+.hero-content p{
+    font-size: 16px;
+}
+
+.newsletter {
+    background-color: var(--black);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.newsletter h2 {
+    color: var(--white);
+}
+
+footer .active {
+    color: var(--primary);
+}
+
+footer h2 {
+    color: var(--white);
+}
+
+.btn {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 0.5rem 2rem;
+    border-radius: 30px;
+    border: 2px solid var(--black);
+    transition: all 0.3s linear;
+}
+
+.btn:hover {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+@media (max-width:800px) {
+    .links a::after {
+        background-color: var(--primary);
+    }
+}
