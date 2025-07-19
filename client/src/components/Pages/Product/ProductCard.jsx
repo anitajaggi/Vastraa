@@ -18,7 +18,7 @@ export const ProductCard = () => (
         exquisite tailoring. urban outline. Power dressing at its finest.
       </p>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <span className="text-md font-semibold text-black">$179</span>
+        <span className="text-md font-semibold text-black">Rs.179</span>
         <button className="text-sm px-4 cursor-pointer py-2 border border-black bg-black text-white rounded-full  hover:text-black hover:bg-white transition">
           More Details
         </button>
