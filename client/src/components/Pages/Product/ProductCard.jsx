@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 export const ProductCard = () => (
   <div className="max-w-sm rounded-2xl overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300 ease-in-out">
     <div className="relative">
@@ -19,9 +21,12 @@ export const ProductCard = () => (
       </p>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <span className="text-md font-semibold text-black">Rs.179</span>
-        <button className="text-sm px-4 cursor-pointer py-2 border border-black bg-black text-white rounded-full  hover:text-black hover:bg-white transition">
+        <NavLink
+          to={"/product/productdetails"}
+          className="text-sm px-4 cursor-pointer py-2 border border-black bg-black text-white rounded-full  hover:text-black hover:bg-white transition"
+        >
           More Details
-        </button>
+        </NavLink>
       </div>
     </div>
   </div>

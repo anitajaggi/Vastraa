@@ -62,20 +62,22 @@ export const Header = () => {
 
         <DesktopNav />
 
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center bg-red-300 px-2 rounded-2xl">
           <button aria-label="User">
-            <NavLink to={"/user"}>
+            <NavLink to={"/auth"}>
               <RiUserFill />
             </NavLink>
           </button>
           <button aria-label="Cart">
-            <NavLink to={"/cart"}>
+            <NavLink className="flex items-center gap-1" to={"/cart"}>
               <RiShoppingCartFill />
+              <span>0</span>
             </NavLink>
           </button>
           <button aria-label="Favorites">
-            <NavLink to={"/wishlist"}>
+            <NavLink className="flex items-center gap-1" to={"/wishlist"}>
               <RiPokerHeartsFill />
+              <span>0</span>
             </NavLink>
           </button>
         </div>
