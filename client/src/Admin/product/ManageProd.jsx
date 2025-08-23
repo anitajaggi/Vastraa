@@ -91,7 +91,7 @@ export const ManageProd = () => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
-                    {prod.images.map((image, index) => (
+                    {prod?.images.map((image, index) => (
                       <img
                         key={index}
                         src={image}
@@ -110,10 +110,10 @@ export const ManageProd = () => {
                   {prod.description}
                 </td>
                 <td className="px-6 py-4">
-                  {prod.colors.map((color) => color).join(", ")}
+                  {prod?.colors.map((color) => color).join(", ")}
                 </td>
                 <td className="px-6 py-4">
-                  {prod.sizes.map((size) => size).join(", ")}
+                  {prod?.sizes.map((size) => size).join(", ")}
                 </td>
                 <td className="px-6 py-4">{prod.rating}</td>
                 <td className="px-6 py-4 flex justify-center gap-2">
