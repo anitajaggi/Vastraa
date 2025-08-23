@@ -16,7 +16,7 @@ router.post("/bulk-delete", isAuthenticated, isAdmin, deleteMultipleFeedback);
 
 router.put("/:id/approve", isAuthenticated, isAdmin, approveReview);
 
-router.get("/", isAuthenticated, getFeedback);
+router.get("/", getFeedback);
 
 router.delete("/:feedId", isAuthenticated, isAdmin, deleteFeedback);
 
