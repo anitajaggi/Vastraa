@@ -121,7 +121,7 @@ export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
                           {subcatByCategoryId[cat._id].map((sub, idx) => (
                             <NavLink
                               key={idx}
-                              to={`/categories/${cat.category}/${sub.subcategory}`}
+                              to={`/categories/${cat.slug}/${sub.slug}`}
                               onClick={closeMenu}
                               className={"cursor-pointer"}
                             >
