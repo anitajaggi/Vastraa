@@ -89,18 +89,20 @@ export const ManageProd = () => {
                 <td className="px-6 py-4" title={prod.productname}>
                   {prod.productname}
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    {prod?.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`Product Image ${index + 1}`}
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                    ))}
-                  </div>
-                </td>
+                <div className="flex gap-2">
+  {Array.isArray(prod.images) && prod.images.length > 0 ? (
+    prod.images.map((image, index) => (
+      <img
+        key={index}
+        src={image}
+        alt={`Product Image ${index + 1}`}
+        className="w-12 h-12 object-cover rounded"
+      />
+    ))
+  ) : (
+    <span className="text-gray-400">No images</span>
+  )}
+</div>
                 <td className="px-6 py-4">{prod.category?.category}</td>
                 <td className="px-6 py-4">{prod.subcategory?.subcategory}</td>
                 <td className="px-6 py-4">{prod.mrp}</td>
@@ -110,11 +112,15 @@ export const ManageProd = () => {
                   {prod.description}
                 </td>
                 <td className="px-6 py-4">
-                  {prod?.colors.map((color) => color).join(", ")}
-                </td>
-                <td className="px-6 py-4">
-                  {prod?.sizes.map((size) => size).join(", ")}
-                </td>
+  {Array.isArray(prod.colors) && prod.colors.length > 0
+    ? prod.colors.join(", ")
+    : "—"}
+</td>
+               <td className="px-6 py-4">
+  {Array.isArray(prod.sizes) && prod.sizes.length > 0
+    ? prod.sizes.join(", ")
+    : "—"}
+</td>
                 <td className="px-6 py-4">{prod.rating}</td>
                 <td className="px-6 py-4 flex justify-center gap-2">
                   <button
