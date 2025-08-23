@@ -1,11 +1,14 @@
 import express from "express";
 import {
   currentUser,
-  getAllUsers,
+  deleteMultipleUsers,
+  deleteUserById,
+  getLimitedUsers,
   login,
   logout,
   register,
   updateProfile,
+  updateUserById,
 } from "../controllers/userController.js";
 import {
   validateLogin,
@@ -26,6 +29,13 @@ router
   .put(isAuthenticated, updateProfile);
 
 //admin routes
-router.get("/", isAuthenticated, isAdmin, getAllUsers);
+router.post("/bulk-delete", isAuthenticated, isAdmin, deleteMultipleUsers);
+
+router.get("/", isAuthenticated, isAdmin, getLimitedUsers);
+
+router
+  .route("/:id")
+  .put(isAuthenticated, isAdmin, updateUserById)
+  .delete(isAuthenticated, isAdmin, deleteUserById);
 
 export default router;

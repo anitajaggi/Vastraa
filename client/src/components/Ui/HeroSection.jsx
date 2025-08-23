@@ -9,12 +9,11 @@ export const HeroSection = () => {
             Fit Checks Start Here
           </span>
           <h1 className="text-4xl md:text-6xl font-bold">
-            Here's Where Your
-            <br className="hidden md:inline" /> New Favorite Outfit Begins
+            Pick Your
+            <br className="hidden md:inline" /> Next Favorite Outfit Today!
           </h1>
           <p className="mt-4">
-            Curated collections created for effortless comfort, self-assurance,
-            and daily style.
+            Easy style, comfy fits, and looks that boost your confidence.
           </p>
           <div className="mt-6 flex justify-start gap-4">
             <NavLink to={"/shop"} className="btn">

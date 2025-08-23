@@ -101,6 +101,31 @@ footer h2 {
     color: var(--black);
 }
 
+input {
+    color: var(--black);
+}
+
+.newsletter input {
+    color: var(--white);
+}
+
+.clr {
+    color: var(--white);
+}
+
+.bg-clr {
+    background-color: var(--white);
+}
+
+.txt-r {
+    color: var(--primary);
+}
+
+.txt-g {
+    color: green;
+}
+
+
 @media (max-width:800px) {
     .links a::after {
         background-color: var(--primary);

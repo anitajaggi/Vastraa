@@ -6,8 +6,7 @@ export const Footer = () => (
       <div>
         <h2 className="text-2xl font-bold tracking-widest mb-4">Vastraa</h2>
         <p className="text-gray-400">
-          Fashion that is crafted with precision for the future. Every stitch
-          has strength.
+          Easy style, comfy fits, and looks that boost your confidence.
         </p>
       </div>
       <div>

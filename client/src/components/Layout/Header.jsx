@@ -1,10 +1,4 @@
-import {
-  RiUserFill,
-  RiShoppingCartFill,
-  RiPokerHeartsFill,
-  RiMenu3Fill,
-  RiCloseFill,
-} from "react-icons/ri";
+import { RiMenu3Fill, RiCloseFill } from "react-icons/ri";
 import { useState, useEffect, useRef } from "react";
 import { DesktopNav } from "./DeskNav";
 import { MobileNav } from "./MobileNav";
@@ -62,26 +56,6 @@ export const Header = () => {
 
         <DesktopNav />
 
-        <div className="flex gap-4 items-center bg-red-300 px-2 rounded-2xl">
-          <button aria-label="User">
-            <NavLink to={"/auth"}>
-              <RiUserFill />
-            </NavLink>
-          </button>
-          <button aria-label="Cart">
-            <NavLink className="flex items-center gap-1" to={"/cart"}>
-              <RiShoppingCartFill />
-              <span>0</span>
-            </NavLink>
-          </button>
-          <button aria-label="Favorites">
-            <NavLink className="flex items-center gap-1" to={"/wishlist"}>
-              <RiPokerHeartsFill />
-              <span>0</span>
-            </NavLink>
-          </button>
-        </div>
-
         <button
           className="md:hidden cursor-pointer"
           onClick={toggleMenu}
@@ -96,6 +70,8 @@ export const Header = () => {
         menuRef={menuRef}
         closeMenu={() => setIsOpen(false)}
       />
+
+      
     </header>
   );
 };

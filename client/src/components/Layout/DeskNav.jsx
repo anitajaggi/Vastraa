@@ -1,5 +1,16 @@
-import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  RiUserFill,
+  RiShoppingCartFill,
+  RiPokerHeartsFill,
+} from "react-icons/ri";
+import { getAllCategories } from "../../Features/category/categoryThunk";
+import { LogoutButton } from "../Ui/logout";
+import { getAllSubCategories } from "../../Features/category/subcatThunk";
+import { getWishlist } from "../../Features/wishlist/wishlistThunk";
+import { getCart } from "../../Features/cart/cartThunk";
 
 const navLinks = [
   { path: "/", label: "Home" },
@@ -9,17 +20,47 @@ const navLinks = [
   { path: "/contact", label: "Contact Us" },
 ];
 
-const categoryDropdown = [
-  { path: "/categories/electronics", label: "Electronics" },
-  { path: "/categories/fashion", label: "Fashion" },
-  { path: "/categories/home", label: "Home & Living" },
-];
-
 export const DesktopNav = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+  const { allCategories } = useSelector((state) => state.categories);
+  const { allSubcategories } = useSelector((state) => state.subcategories);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { items } = useSelector((state) => state.wishlist);
+  const { items: cartItems } = useSelector((state) => state.cart);
+  const totalWishlistItems = items.length;
+  const totalCartItems = cartItems.length;
+
+  useEffect(() => {
+    dispatch(getAllCategories());
+    dispatch(getAllSubCategories());
+    dispatch(getCart());
+    dispatch(getWishlist());
+  }, [dispatch]);
+
+  const handleUserClick = () => {
+    if (loading || isAuthenticated === null) return;
+    if (!isAuthenticated) {
+      navigate("/auth");
+    } else if (user?.isAdmin) {
+      navigate("/admin");
+    } else {
+      navigate("/profile");
+    }
+  };
+
+  const subcatByCategoryId = allCategories.reduce((acc, category) => {
+    acc[category._id] = allSubcategories.filter(
+      (sub) => sub.categoryId._id === category._id
+    );
+    return acc;
+  }, {});
 
   return (
-    <nav className="hidden links md:flex gap-6">
+    <nav className="hidden links md:flex items-center gap-6">
       {navLinks.map((link) =>
         link.label === "Categories" ? (
           <div
@@ -28,7 +69,7 @@ export const DesktopNav = () => {
             onMouseEnter={() => setIsDropdownOpen(true)}
             onMouseLeave={() => setIsDropdownOpen(false)}
           >
-            <div className="flex items-center gap-1 cursor-pointer">
+            <div className="flex items-center gap-1 cursor-pointer text-white">
               {link.label}
               <svg
                 className="h-4 w-4"
@@ -44,25 +85,73 @@ export const DesktopNav = () => {
                 />
               </svg>
             </div>
+
             {isDropdownOpen && (
-              <div className="absolute top-4 w-100 left-0 mt-2 shadow-lg rounded-md z-50 dropdown">
-                {categoryDropdown.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className="block px-4 py-2 text-white hover:bg-black"
-                  >
-                    {item.label}
-                  </NavLink>
+              <div className="absolute top-4 left-0 mt-2 bg-red-700 text-white shadow-lg rounded-md z-50 min-w-[200px]">
+                {allCategories.map((cat) => (
+                  <div key={cat._id} className="group relative">
+                    <NavLink
+                      to={`/shop/${cat.slug}`}
+                      className="block px-4 py-2 hover:bg-black font-medium"
+                    >
+                      {cat.category}
+                    </NavLink>
+
+                    {subcatByCategoryId[cat._id]?.length > 0 && (
+                      <div className="absolute top-0 left-full overflow-hidden mt-0 hidden group-hover:block bg-red-800 shadow-md rounded-md z-50 min-w-[180px]">
+                        {subcatByCategoryId[cat._id].map((sub, index) => (
+                          <NavLink
+                            key={index}
+                            to={`/shop/${cat.slug}/${sub.slug}`}
+                            className="block px-4 py-2 text-sm hover:bg-black"
+                          >
+                            {sub.subcategory}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <NavLink key={link.path} to={link.path}>
+          <NavLink
+            key={link.path}
+            to={link.path}
+            className="text-white transition"
+          >
             {link.label}
           </NavLink>
         )
+      )}
+
+      <div className="flex gap-4 items-center bg-black/30 px-2 py-1 rounded-2xl">
+        <button onClick={handleUserClick} className="cursor-pointer text-white">
+          {isAuthenticated ? (
+            <span className="text-sm font-medium">
+              {user?.isAdmin ? "Dashboard" : "Profile"}
+            </span>
+          ) : (
+            <RiUserFill />
+          )}
+        </button>
+
+        <NavLink to="/cart" className="flex items-center gap-1 text-white">
+          <RiShoppingCartFill />
+          <span>{totalCartItems}</span>
+        </NavLink>
+
+        <NavLink to="/wishlist" className="flex items-center gap-1 text-white">
+          <RiPokerHeartsFill />
+          <span>{totalWishlistItems}</span>
+        </NavLink>
+      </div>
+
+      {isAuthenticated && (
+        <div onClick={() => setIsDropdownOpen(false)}>
+          <LogoutButton />
+        </div>
       )}
     </nav>
   );

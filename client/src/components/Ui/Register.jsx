@@ -1,6 +1,41 @@
-import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { clearFieldError } from "../../Features/Auth/authSlice";
+import { currentUser, registerUser } from "../../Features/Auth/authThunk";
+import { useState } from "react";
 
 export const Register = () => {
+  const { fieldErrors } = useSelector((state) => state.auth);
+  const [registerData, setRegisterData] = useState({
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    if (fieldErrors[e.target.name]) {
+      dispatch(clearFieldError(e.target.name));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await dispatch(registerUser(registerData));
+    if (registerUser.fulfilled.match(res)) {
+      setRegisterData({ username: "", email: "", phone: "", password: "" });
+      await dispatch(currentUser());
+      navigate("/profile");
+    }
+  };
+
   return (
     <div className="lex items-center justify-center bg-[#fafafa] px-4 py-12">
       <div className="max-w-md m-auto w-full border border-black bg-white p-4 md:p-8 rounded-2xl shadow-md">
@@ -11,16 +46,26 @@ export const Register = () => {
           </p>
         </div>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Username
             </label>
             <input
               type="text"
-              className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black"
-              placeholder="e.g. aarav_singh"
+              name="username"
+              className={`mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black ${
+                fieldErrors?.username ? "border-red-600" : "border-gray-300"
+              }`}
+              placeholder="e.g. aarav singh"
+              value={registerData.username}
+              onChange={handleOnChange}
             />
+            {fieldErrors?.username && (
+              <p className="text-red-600 txt-r text-sm mt-1">
+                {fieldErrors.username}
+              </p>
+            )}
           </div>
 
           <div>
@@ -29,10 +74,20 @@ export const Register = () => {
             </label>
             <input
               type="email"
-              className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black"
+              name="email"
+              className={`mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black ${
+                fieldErrors?.email ? "border-red-600" : "border-gray-300"
+              }`}
               placeholder="you@example.com"
               autoComplete="email"
+              value={registerData.email}
+              onChange={handleOnChange}
             />
+            {fieldErrors?.email && (
+              <p className="text-red-600 txt-r text-sm mt-1">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
 
           <div>
@@ -41,10 +96,20 @@ export const Register = () => {
             </label>
             <input
               type="tel"
-              className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black"
-              placeholder="+91 98765 43210"
+              name="phone"
+              className={`mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black ${
+                fieldErrors?.phone ? "border-red-600" : "border-gray-300"
+              }`}
+              placeholder="+91 000 000 0000"
               autoComplete="phone"
+              value={registerData.phone}
+              onChange={handleOnChange}
             />
+            {fieldErrors?.phone && (
+              <p className="text-red-600 txt-r text-sm mt-1">
+                {fieldErrors.phone}
+              </p>
+            )}
           </div>
 
           <div>
@@ -53,15 +118,25 @@ export const Register = () => {
             </label>
             <input
               type="password"
-              className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black"
+              name="password"
+              className={`mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black ${
+                fieldErrors?.password ? "border-red-600" : "border-gray-300"
+              }`}
               placeholder="••••••••"
               autoComplete="current-password"
+              value={registerData.password}
+              onChange={handleOnChange}
             />
+            {fieldErrors?.password && (
+              <p className="text-red-600 txt-r text-sm mt-1">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+            className="w-full cursor-pointer bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
           >
             Create Account
           </button>

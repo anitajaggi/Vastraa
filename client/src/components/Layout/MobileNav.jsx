@@ -1,5 +1,10 @@
-import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCategories } from "../../Features/category/categoryThunk";
+import { LogoutButton } from "../Ui/logout";
+import { getAllSubCategories } from "../../Features/category/subcatThunk";
+import { getWishlist } from "../../Features/wishlist/wishlistThunk";
 
 const navLinks = [
   { path: "/", label: "Home" },
@@ -9,33 +14,82 @@ const navLinks = [
   { path: "/contact", label: "Contact Us" },
 ];
 
-const categoryDropdown = [
-  { path: "/categories/electronics", label: "Electronics" },
-  { path: "/categories/fashion", label: "Fashion" },
-  { path: "/categories/home", label: "Home & Living" },
-];
-
 export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+  const { allCategories } = useSelector((state) => state.categories);
+  const { allSubcategories } = useSelector((state) => state.subcategories);
+
+  const { items } = useSelector((state) => state.wishlist);
+  const { items: cartItems } = useSelector((state) => state.cart);
+  const totalWishlistItems = items.length;
+  const totalCartItems = cartItems.length;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getAllCategories());
+    dispatch(getAllSubCategories());
+    dispatch(getWishlist());
+  }, [dispatch]);
+
+  const handleUserClick = () => {
+    if (loading || isAuthenticated === null) return;
+    if (!isAuthenticated) {
+      navigate("/auth");
+    } else if (user?.isAdmin) {
+      navigate("/admin");
+    } else {
+      navigate("/profile");
+    }
+    closeMenu();
+  };
+
+  const subcatByCategoryId = allCategories.reduce((acc, category) => {
+    const filtered = allSubcategories.filter(
+      (sub) => sub.categoryId && sub.categoryId._id === category._id
+    );
+    acc[category._id] = filtered;
+    return acc;
+  }, {});
 
   return (
     <nav
       ref={menuRef}
-      className={`links md:hidden z-50 absolute w-100 transition-all duration-300 ease-in-out overflow-hidden ${
-        isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-      }`}
+      className={`fixed links top-16 left-0 right-0 bg-white z-50 shadow-xl overflow-y-auto transition-all duration-300 ease-in-out
+        ${isOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"} 
+      `}
     >
-      <div className="bg-white px-6 py-4 border-t border-indigo-100 space-y-3 text-sm text-black flex flex-col">
+      <div className="px-6 py-4 border-t border-indigo-100 space-y-4 text-sm text-black flex flex-col">
+        <span onClick={handleUserClick} className="cursor-pointer">
+          {isAuthenticated ? (
+            <span className="text-sm font-semibold text-green-700">
+              {user?.isAdmin ? "Dashboard" : "Profile"}
+            </span>
+          ) : (
+            "Login"
+          )}
+        </span>
+
+        <NavLink onClick={closeMenu} to="/cart">
+          Cart <span>{totalCartItems}</span>
+        </NavLink>
+        <NavLink onClick={closeMenu} to="/wishlist">
+          Wishlist <span>{totalWishlistItems}</span>
+        </NavLink>
+
         {navLinks.map((link) =>
           link.label === "Categories" ? (
-            <div key={link.path} className="flex flex-col gap-2">
-              <span
-                onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="cursor-pointer font-medium flex items-center gap-1"
+            <div key={link.path} className="flex flex-col">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center cursor-pointer justify-between font-medium text-left"
               >
                 {link.label}
                 <svg
-                  className={`h-4 w-4 transform transition-transform ${
+                  className={`w-4 h-4 transform transition-transform ${
                     isDropdownOpen ? "rotate-180" : ""
                   }`}
                   fill="none"
@@ -45,31 +99,54 @@ export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="2"
+                    strokeWidth={2}
                     d="M19 9l-7 7-7-7"
                   />
                 </svg>
-              </span>
-              {isDropdownOpen &&
-                categoryDropdown.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      closeMenu();
-                    }}
-                    className="pl-4 text-gray-600"
-                  >
-                    {item.label}
-                  </NavLink>
-                ))}
+              </button>
+
+              {isDropdownOpen && (
+                <div className="mt-2 pl-4 flex flex-col gap-2">
+                  {allCategories.map((cat) => (
+                    <div key={cat._id}>
+                      <NavLink
+                        to={`/categories/${cat.category}`}
+                        onClick={closeMenu}
+                        className="font-semibold cursor-pointer text-gray-800"
+                      >
+                        {cat.category}
+                      </NavLink>
+                      {subcatByCategoryId[cat._id]?.length > 0 && (
+                        <div className="pl-4 mt-1 flex flex-col gap-1 text-gray-600 text-sm">
+                          {subcatByCategoryId[cat._id].map((sub, idx) => (
+                            <NavLink
+                              key={idx}
+                              to={`/categories/${cat.category}/${sub.subcategory}`}
+                              onClick={closeMenu}
+                              className={"cursor-pointer"}
+                            >
+                              {sub.subcategory}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <NavLink key={link.path} to={link.path} onClick={closeMenu}>
               {link.label}
             </NavLink>
           )
+        )}
+
+        {/* Logout */}
+        {isAuthenticated && (
+          <div onClick={closeMenu}>
+            <LogoutButton />
+          </div>
         )}
       </div>
     </nav>
