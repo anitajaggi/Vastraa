@@ -7,8 +7,8 @@ import userModel from "../models/userModel.js";
 export const register = async (req, res) => {
   const { username, email, phone, password } = req.body;
 
-  const exitstingUser = await UserModel.findOne({ email });
-  if (exitstingUser) {
+  const existingUser = await UserModel.findOne({ email });
+  if (existingUser) {
     return res.status(400).json({ message: "User already exists!" });
   }
 
@@ -60,13 +60,8 @@ export const logout = async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-<<<<<<< HEAD
-  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-  path: "/",
-=======
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     path: "/",
->>>>>>> 77c5936 (your message here)
   });
 
   res.json({
@@ -180,7 +175,7 @@ export const updateUserById = async (req, res) => {
       }
     }
 
-    // Check if admin is being demoted
+    // Prevent demoting the last admin
     const isDemotingAdmin =
       user.isAdmin &&
       req.body.hasOwnProperty("isAdmin") &&
