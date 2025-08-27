@@ -89,30 +89,14 @@ export const ManageProd = () => {
                 <td className="px-6 py-4" title={prod.productname}>
                   {prod.productname}
                 </td>
-<<<<<<< HEAD
-                <div className="flex gap-2">
-  {Array.isArray(prod.images) && prod.images.length > 0 ? (
-    prod.images.map((image, index) => (
-      <img
-        key={index}
-        src={image}
-        alt={`Product Image ${index + 1}`}
-        className="w-12 h-12 object-cover rounded"
-      />
-    ))
-  ) : (
-    <span className="text-gray-400">No images</span>
-  )}
-</div>
-=======
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     {Array.isArray(prod.images) && prod.images.length > 0 ? (
-                      prod.images.map((image, index) => (
+                      prod.images.map((image, idx) => (
                         <img
-                          key={index}
+                          key={idx}
                           src={image}
-                          alt={`Product Image ${index + 1}`}
+                          alt={`Product Image ${idx + 1}`}
                           className="w-12 h-12 object-cover rounded"
                         />
                       ))
@@ -121,7 +105,6 @@ export const ManageProd = () => {
                     )}
                   </div>
                 </td>
->>>>>>> 77c5936 (your message here)
                 <td className="px-6 py-4">{prod.category?.category}</td>
                 <td className="px-6 py-4">{prod.subcategory?.subcategory}</td>
                 <td className="px-6 py-4">{prod.mrp}</td>
@@ -131,17 +114,6 @@ export const ManageProd = () => {
                   {prod.description}
                 </td>
                 <td className="px-6 py-4">
-<<<<<<< HEAD
-  {Array.isArray(prod.colors) && prod.colors.length > 0
-    ? prod.colors.join(", ")
-    : "—"}
-</td>
-               <td className="px-6 py-4">
-  {Array.isArray(prod.sizes) && prod.sizes.length > 0
-    ? prod.sizes.join(", ")
-    : "—"}
-</td>
-=======
                   {Array.isArray(prod.colors) && prod.colors.length > 0
                     ? prod.colors.join(", ")
                     : "—"}
@@ -151,7 +123,6 @@ export const ManageProd = () => {
                     ? prod.sizes.join(", ")
                     : "—"}
                 </td>
->>>>>>> 77c5936 (your message here)
                 <td className="px-6 py-4">{prod.rating}</td>
                 <td className="px-6 py-4 flex justify-center gap-2">
                   <button
@@ -175,6 +146,7 @@ export const ManageProd = () => {
           </tbody>
         </table>
       </div>
+
       <Pagination
         page={page}
         currentPage={currentPage}
@@ -182,6 +154,7 @@ export const ManageProd = () => {
         loading={loading}
         onPageChange={setPage}
       />
+
       <ConfirmDialog
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -189,6 +162,7 @@ export const ManageProd = () => {
         title="Delete Product"
         description="Are you sure you want to delete this product? This action cannot be undone."
       />
+
       <ConfirmDialog
         isOpen={isMultiConfirmOpen}
         onClose={() => setIsMultiConfirmOpen(false)}
