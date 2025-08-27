@@ -110,11 +110,7 @@ export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
                   {allCategories.map((cat) => (
                     <div key={cat._id}>
                       <NavLink
-<<<<<<< HEAD
-                        to={`/shop/${cat.category}`}
-=======
                         to={`/shop/${cat.slug}`}
->>>>>>> 77c5936 (your message here)
                         onClick={closeMenu}
                         className="font-semibold cursor-pointer text-gray-800"
                       >
@@ -127,7 +123,7 @@ export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
                               key={idx}
                               to={`/shop/${cat.slug}/${sub.slug}`}
                               onClick={closeMenu}
-                              className={"cursor-pointer"}
+                              className="cursor-pointer"
                             >
                               {sub.subcategory}
                             </NavLink>
