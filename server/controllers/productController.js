@@ -262,3 +262,27 @@ export const singleProduct = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getCartProduct = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: "Invalid IDs" });
+  }
+
+  try {
+    const products = await productModel.find({ _id: { $in: ids } });
+
+    const response = products.map((p) => ({
+      id: p._id,
+      name: p.name,
+      price: p.price,
+      images: p.images,
+      stock: p.stock,
+    }));
+
+    res.json(response);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};

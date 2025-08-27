@@ -102,3 +102,28 @@ export const getSingleProduct = createAsyncThunk(
     }
   }
 );
+
+export const fetchCartDetails = createAsyncThunk(
+  "cart/fetchCartDetails",
+  async (cartItems, { rejectWithValue }) => {
+    try {
+      const productIds = cartItems.map((item) => item.productId);
+
+      const response = await axiosApi.post("/products/carts", {
+        ids: productIds,
+      });
+
+      const detailedItems = cartItems
+        .map((item) => {
+          const product = response.data.find((p) => p.id === item.productId);
+          return product ? { ...product, ...item } : null;
+        })
+        .filter(Boolean);
+      return detailedItems;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || "Error fetching cart details"
+      );
+    }
+  }
+);

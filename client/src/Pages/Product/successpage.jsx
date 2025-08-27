@@ -31,15 +31,15 @@ export const OrderSuccess = () => {
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => navigate("/shop")}
-            className="px-6 py-3 bg-black hover:bg-gray-700 text-white font-semibold rounded-lg transition"
+            onClick={() => navigate("/shop", { replace: true })}
+            className="px-6 py-3 bg-black hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition"
           >
             Continue Shopping
           </button>
 
           <button
-            onClick={() => navigate("/profile")}
-            className="px-6 py-3 border border-black text-black rounded-lg font-medium transition"
+            onClick={() => navigate("/profile", { replace: true })}
+            className="px-6 py-3 border border-black text-black cursor-pointer rounded-lg font-medium transition"
           >
             View My Orders
           </button>

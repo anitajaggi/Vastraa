@@ -134,24 +134,36 @@ export const ProductDetails = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
-                className="w-8 h-8 border border-black cursor-pointer text-black rounded hover:bg-gray-100"
+                disabled={quantity <= 1}
+                className="w-8 h-8 border border-black text-black rounded hover:bg-gray-100 disabled:opacity-50"
               >
                 −
               </button>
+
               <span className="w-8 text-center text-black">{quantity}</span>
+
               <button
-                onClick={() => setQuantity((prev) => prev + 1)}
-                className="w-8 h-8 border border-black cursor-pointer text-black rounded hover:bg-gray-100"
+                onClick={() =>
+                  setQuantity((prev) =>
+                    prev < product.stock ? prev + 1 : prev
+                  )
+                }
+                disabled={quantity >= product.stock}
+                className="w-8 h-8 border border-black text-black rounded hover:bg-gray-100 disabled:opacity-50"
               >
                 +
               </button>
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {product.stock} item{product.stock === 1 ? "" : "s"} available
+            </p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
             {product?._id && (
               <AddToCart
                 productId={product._id}
+                product={product}
                 size={selectedSize}
                 color={selectedColor}
                 quantity={quantity}

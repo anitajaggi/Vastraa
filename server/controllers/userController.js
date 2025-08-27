@@ -60,8 +60,13 @@ export const logout = async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+<<<<<<< HEAD
   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   path: "/",
+=======
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    path: "/",
+>>>>>>> 77c5936 (your message here)
   });
 
   res.json({

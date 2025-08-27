@@ -52,7 +52,7 @@ function App() {
         { path: "/register", element: <Register /> },
         { path: "/product/:slug", element: <ProductDetails /> },
         { path: "/checkout", element: <Checkout /> },
-        { path: "/wishlist", element: <Wishlist /> },
+        { path: "/cart", element: <Cart /> },
         { path: "/order-success", element: <OrderSuccess /> },
         {
           element: <PrivateRoute />,
@@ -86,7 +86,7 @@ function App() {
               ],
             },
             { path: "/profile", element: <UserDashboard /> },
-            { path: "/cart", element: <Cart /> },
+            { path: "/wishlist", element: <Wishlist /> },
           ],
         },
         { path: "*", element: <NotFound /> },

@@ -1,43 +1,72 @@
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { placeOrder } from "../../Features/checkout/orderThunk";
 import { resetOrder } from "../../Features/checkout/orderSlice";
 import { clearCart } from "../../Features/cart/cartSlice";
+import { fetchCartDetails } from "../../Features/products/productThunk";
+import { Popup } from "../../components/Ui/Popup";
 
 export const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items } = useSelector((s) => s.cart);
-  const { loading, error } = useSelector((s) => s.orders);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const { items: cartItems, loading: cartLoading } = useSelector(
+    (state) => state.cart
+  );
+  const { loading: orderLoading } = useSelector((state) => state.orders);
+
+  useEffect(() => {
+    if (cartItems.length) {
+      dispatch(fetchCartDetails(cartItems));
+    }
+  }, []);
 
   const [address, setAddress] = useState({
     name: "",
     phone: "",
-    address: "",
+    addressLine: "",
     city: "",
-    state: "",
+    stateName: "",
     pincode: "",
   });
-
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.quantity * item.productId.price,
-    0
-  );
 
   const handleChange = (e) =>
     setAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handlePlaceOrder = async () => {
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + (item.price || 0) * item.quantity,
+    0
+  );
+
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setIsOpen(true);
+      return;
+    }
+
+    const shippingAddress = {
+      name: address.name,
+      phone: address.phone,
+      address: address.addressLine,
+      city: address.city,
+      state: address.stateName,
+      pincode: address.pincode,
+    };
+
     const orderData = {
-      items: items.map((i) => ({
-        productId: i.productId._id,
+      items: cartItems.map((i) => ({
+        productId: i.productId,
         quantity: i.quantity,
-        price: i.productId.price,
+        price: i.price,
         size: i.size,
         color: i.color,
       })),
-      shippingAddress: address,
+      shippingAddress,
       paymentMethod: "COD",
       totalAmount: subtotal,
     };
@@ -47,8 +76,8 @@ export const Checkout = () => {
       dispatch(clearCart());
       dispatch(resetOrder());
       navigate("/order-success", {
-        state: { fromCheckout: true },
         replace: true,
+        state: { fromCheckout: true },
       });
     } catch (err) {
       console.error("Order failed:", err);
@@ -56,32 +85,42 @@ export const Checkout = () => {
   };
 
   return (
-    <div className="max-w-5xl mt-10 mx-auto">
+    <div className="max-w-7xl mt-10 mx-auto">
       <h2 className="text-2xl md:text-5xl font-bold mb-4 text-center">
         Checkout
       </h2>
+
       <div className="shadow p-4 rounded">
         <div className="mb-6 border p-4 rounded text-black">
           <h3 className="font-semibold mb-2">Your Cart</h3>
-          {items.map((item) => (
-            <div key={item.productId._id} className="flex justify-between mb-2">
-              <div>
-                <span className="font-medium">
-                  {item.productId.productname}
+          {cartLoading ? (
+            <p>Loading cart details...</p>
+          ) : cartItems.length > 0 ? (
+            cartItems.map((item) => (
+              <div
+                key={`${item.productId._id}-${item.size}-${item.color}`}
+                className="flex justify-between mb-2"
+              >
+                <div>
+                  <span className="font-medium">
+                    {item.productId.productname}
+                  </span>
+                  <div className="text-sm text-gray-600">
+                    {item.color && <span>Color: {item.color} </span>}
+                    {item.size && <span> | Size: {item.size}</span>}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Qty: {item.quantity}
+                  </div>
+                </div>
+                <span className="font-semibold">
+                  ₹{item.price * item.quantity}
                 </span>
-                <div className="text-sm text-gray-600">
-                  {item.color && <span>Color: {item.color} </span>}
-                  {item.size && <span> | Size: {item.size}</span>}
-                </div>
-                <div className="text-sm text-gray-600">
-                  Qty: {item.quantity}
-                </div>
               </div>
-              <span className="font-semibold">
-                ₹{item.productId.price * item.quantity}
-              </span>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>Your cart is empty 🛒</p>
+          )}
           <hr className="my-2" />
           <div className="flex justify-between font-semibold">
             <span>Total:</span>
@@ -89,45 +128,88 @@ export const Checkout = () => {
           </div>
         </div>
 
-        <div className="mb-6">
-          <h3 className="font-semibold mb-2">Shipping Address</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {["name", "phone", "address", "city", "state", "pincode"].map(
-              (field) => (
-                <input
-                  key={field}
-                  type="text"
-                  name={field}
-                  placeholder={field[0].toUpperCase() + field.slice(1)}
-                  value={address[field]}
-                  onChange={handleChange}
-                  className={`border p-2 rounded ${
-                    field === "address" ? "col-span-2" : ""
-                  }`}
-                />
-              )
-            )}
+        <form onSubmit={handlePlaceOrder}>
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">Shipping Address</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                type="text"
+                name="name"
+                required
+                placeholder="Name"
+                value={address.name}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="number"
+                name="phone"
+                placeholder="Phone"
+                required
+                value={address.phone}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="text"
+                name="addressLine"
+                placeholder="Address"
+                required
+                value={address.addressLine}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="text"
+                name="city"
+                required
+                placeholder="City"
+                value={address.city}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="text"
+                name="stateName"
+                required
+                placeholder="State"
+                value={address.stateName}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+              <input
+                type="number"
+                name="pincode"
+                required
+                placeholder="Pincode"
+                value={address.pincode}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+            </div>
           </div>
-        </div>
-
-        {error && <p className="mb-4 text-red-600">{String(error)}</p>}
-
-        <button
-          onClick={handlePlaceOrder}
-          disabled={
-            loading ||
-            !address.name ||
-            !address.phone ||
-            !address.address ||
-            !address.city ||
-            !address.state ||
-            !address.pincode
-          }
-          className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400"
-        >
-          {loading ? "Placing Order..." : "Place Order"}
-        </button>
+          <button
+            disabled={
+              cartLoading ||
+              !address.name ||
+              !address.phone ||
+              !address.addressLine ||
+              !address.city ||
+              !address.stateName ||
+              !address.pincode
+            }
+            className="w-full bg-black text-white py-3 cursor-pointer rounded disabled:bg-gray-400"
+          >
+            {orderLoading ? "Placing Order..." : "Place Order"}
+          </button>
+        </form>
       </div>
+      <Popup
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Login Required"
+        description="You need to be logged in to place an order. Please log in to continue."
+      />
     </div>
   );
 };

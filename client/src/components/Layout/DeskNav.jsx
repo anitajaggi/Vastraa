@@ -10,7 +10,6 @@ import { getAllCategories } from "../../Features/category/categoryThunk";
 import { LogoutButton } from "../Ui/logout";
 import { getAllSubCategories } from "../../Features/category/subcatThunk";
 import { getWishlist } from "../../Features/wishlist/wishlistThunk";
-import { getCart } from "../../Features/cart/cartThunk";
 
 const navLinks = [
   { path: "/", label: "Home" },
@@ -30,14 +29,13 @@ export const DesktopNav = () => {
   const navigate = useNavigate();
 
   const { items } = useSelector((state) => state.wishlist);
-  const { items: cartItems } = useSelector((state) => state.cart);
   const totalWishlistItems = items.length;
+  const { items: cartItems } = useSelector((state) => state.cart);
   const totalCartItems = cartItems.length;
 
   useEffect(() => {
     dispatch(getAllCategories());
     dispatch(getAllSubCategories());
-    dispatch(getCart());
     dispatch(getWishlist());
   }, [dispatch]);
 

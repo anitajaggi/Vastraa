@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { updateCartQty } from "../../Features/cart/cartThunk";
+import { updateCartQty } from "../../Features/cart/cartSlice";
 
 export const CartQuantity = ({ item }) => {
   const dispatch = useDispatch();
@@ -7,16 +7,18 @@ export const CartQuantity = ({ item }) => {
   const handleQtyChange = (type) => {
     let newQty = item.quantity;
 
-    if (type === "increment") {
+    if (type === "increment" && item.quantity < item.stock) {
       newQty = item.quantity + 1;
     } else if (type === "decrement" && item.quantity > 1) {
       newQty = item.quantity - 1;
     }
 
-    if (newQty > 0) {
+    if (newQty !== item.quantity) {
       dispatch(
         updateCartQty({
-          productId: item.productId._id,
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
           quantity: newQty,
         })
       );
@@ -27,7 +29,8 @@ export const CartQuantity = ({ item }) => {
     <div className="flex items-center gap-2">
       <button
         onClick={() => handleQtyChange("decrement")}
-        className="w-8 h-8 border rounded text-lg hover:bg-gray-100"
+        disabled={item.quantity <= 1}
+        className="w-8 h-8 border rounded text-lg hover:bg-gray-100 disabled:opacity-50"
       >
         −
       </button>
@@ -36,7 +39,8 @@ export const CartQuantity = ({ item }) => {
 
       <button
         onClick={() => handleQtyChange("increment")}
-        className="w-8 h-8 border rounded text-lg hover:bg-gray-100"
+        disabled={item.quantity >= item.stock}
+        className="w-8 h-8 border rounded text-lg hover:bg-gray-100 disabled:opacity-50"
       >
         +
       </button>

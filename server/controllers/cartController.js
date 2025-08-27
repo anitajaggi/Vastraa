@@ -1,103 +1,124 @@
-import cartModel from "../models/cartModel.js";
+// import productModel from "../models/productModel.js";
 
-export const addToCart = async (req, res) => {
-  const userId = req.user._id;
-  const { productId, size, color, quantity } = req.body;
+// // Add to cart
+// export const addToCart = async (req, res) => {
+//   const { productId, size, color, quantity } = req.body;
 
-  try {
-    let cart = await cartModel.findOne({ userId });
-    if (!cart) {
-      cart = new cartModel({ userId, items: [] });
-    }
+//   try {
+//     if (!req.session.cart) req.session.cart = [];
 
-    const existing = cart.items.find(
-      (p) =>
-        p.productId.toString() === productId &&
-        p.size === size &&
-        p.color === color
-    );
+//     const existing = req.session.cart.find(
+//       (item) =>
+//         item.productId === productId &&
+//         item.size === size &&
+//         item.color === color
+//     );
 
-    if (existing) {
-      existing.quantity += quantity;
-    } else {
-      cart.items.push({ productId, size, color, quantity });
-    }
+//     if (existing) {
+//       existing.quantity += quantity;
+//     } else {
+//       req.session.cart.push({ productId, size, color, quantity });
+//     }
 
-    await cart.save();
-    await cart.populate("items.productId");
-    res.json({
-      message: "Product added to cart successfully!",
-      success: true,
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
+//     const cartProducts = await Promise.all(
+//       req.session.cart.map(async (item) => {
+//         const product = await productModel.findById(item.productId);
+//         return {
+//           ...item,
+//           name: product.productname,
+//           price: product.price,
+//           stock: product.stock,
+//           images: product.images,
+//         };
+//       })
+//     );
 
-export const getCart = async (req, res) => {
-  try {
-    const cart = await cartModel
-      .findOne({ userId: req.user._id })
-      .populate("items.productId");
-    res.json({
-      message: "Cart fetched successfully!",
-      success: true,
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
+//     res.json({ message: "Successfully Inserted Cart", cart: cartProducts });
+//   } catch (error) {
+//     res.json({ message: "Failed try again!" });
+//   }
+// };
 
-export const removeFromCart = async (req, res) => {
-  try {
-    const { productId } = req.params;
-    const userId = req.user._id;
+// // Remove from cart
+// export const removeFromCart = async (req, res) => {
+//   const { productId, size, color } = req.body;
 
-    let cart = await cartModel.findOne({ userId });
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+//   if (!req.session.cart) req.session.cart = [];
 
-    cart.items = cart.items.filter(
-      (i) => i.productId.toString() !== productId.toString()
-    );
+//   req.session.cart = req.session.cart.filter(
+//     (item) =>
+//       !(
+//         String(item.productId) === String(productId) &&
+//         item.size === size &&
+//         item.color === color
+//       )
+//   );
 
-    await cart.save();
+//   const cartProducts = await Promise.all(
+//     req.session.cart.map(async (item) => {
+//       const product = await productModel.findById(item.productId);
+//       return {
+//         ...item,
+//         name: product.productname,
+//         price: product.price,
+//         stock: product.stock,
+//         images: product.images,
+//       };
+//     })
+//   );
 
-    await cart.populate("items.productId");
+//   res.json({ cart: cartProducts });
+// };
 
-    res.json({ message: "Product removed from cart successfully!", cart });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+// // Get cart
+// export const getCart = async (req, res) => {
+//   const cart = req.session.cart || [];
 
-export const updateCartQty = async (req, res) => {
-  try {
-    const { productId, quantity } = req.body;
-    const userId = req.user._id;
+//   const cartProducts = await Promise.all(
+//     cart.map(async (item) => {
+//       const product = await productModel.findById(item.productId);
+//       return {
+//         ...item,
+//         name: product.productname,
+//         price: product.price,
+//         stock: product.stock,
+//         images: product.images,
+//       };
+//     })
+//   );
 
-    let cart = await cartModel.findOne({ userId });
+//   res.json({ cart: cartProducts });
+// };
 
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+// // Update quantity in session cart
+// export const updateCartQty = async (req, res) => {
+//   const { productId, size, color, quantity } = req.body;
 
-    const item = cart.items.find(
-      (i) => i.productId.toString() === productId.toString()
-    );
+//   if (!req.session.cart) req.session.cart = [];
 
-    if (!item) return res.status(404).json({ message: "Item not in cart" });
+//   const existing = req.session.cart.find(
+//     (item) =>
+//       String(item.productId) === String(productId) &&
+//       item.size === size &&
+//       item.color === color
+//   );
 
-    item.quantity = quantity;
-    if (item.quantity <= 0) {
-      cart.items = cart.items.filter(
-        (i) => i.productId.toString() !== productId.toString()
-      );
-    }
+//   if (existing) {
+//     existing.quantity = quantity;
+//   }
 
-    await cart.save();
-    await cart.populate("items.productId");
-    res.json({ message: "Cart updated successfully!", cart });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+//   const cartProducts = await Promise.all(
+//     req.session.cart.map(async (item) => {
+//       const product = await productModel.findById(item.productId);
+//       return {
+//         ...item,
+//         name: product.productname,
+//         price: product.price,
+//         stock: product.stock,
+//         images: product.images,
+//       };
+//     })
+//   );
+
+//   res.json({ message: "Qty Updated", cart: cartProducts });
+// };

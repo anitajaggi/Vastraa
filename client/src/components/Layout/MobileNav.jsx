@@ -110,7 +110,11 @@ export const MobileNav = ({ isOpen, menuRef, closeMenu }) => {
                   {allCategories.map((cat) => (
                     <div key={cat._id}>
                       <NavLink
+<<<<<<< HEAD
                         to={`/shop/${cat.category}`}
+=======
+                        to={`/shop/${cat.slug}`}
+>>>>>>> 77c5936 (your message here)
                         onClick={closeMenu}
                         className="font-semibold cursor-pointer text-gray-800"
                       >

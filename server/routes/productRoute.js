@@ -6,6 +6,7 @@ import {
   createProduct,
   deleteMultipleProducts,
   deleteProduct,
+  getCartProduct,
   getLimitedProducts,
   singleProduct,
   updateProduct,
@@ -25,6 +26,7 @@ routes.post(
 );
 routes.get("/", getLimitedProducts);
 routes.get("/:slug", singleProduct);
+routes.post("/carts", getCartProduct);
 
 routes.put(
   "/:proId",

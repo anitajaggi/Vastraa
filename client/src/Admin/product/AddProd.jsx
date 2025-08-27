@@ -21,6 +21,7 @@ export const AddProd = () => {
     description: "",
     colors: "",
     sizes: "",
+    rating: "",
   });
 
   const [images, setImages] = useState([]);
@@ -59,7 +60,6 @@ export const AddProd = () => {
     if (idFromUrl && products.length > 0 && allSubcategories.length > 0) {
       const existing = products.find((prod) => prod._id === idFromUrl);
       if (existing) {
-        // Filter subcategories BEFORE setting formData
         const filtered = allSubcategories.filter(
           (sub) => sub.categoryId?._id === existing.category?._id
         );
@@ -76,6 +76,7 @@ export const AddProd = () => {
           description: existing.description,
           colors: existing.colors.join(", "),
           sizes: existing.sizes.join(", "),
+          rating: existing.rating,
         });
         setImages(existing.images);
       }
@@ -116,11 +117,11 @@ export const AddProd = () => {
     });
 
     if (errors.length > 0) {
-      setImageError(errors.join(" ")); // Set error state
-      e.target.value = null; // Reset file input
+      setImageError(errors.join(" "));
+      e.target.value = null;
       setImages([]);
     } else {
-      setImageError(""); // Clear any previous errors
+      setImageError("");
       setImages(validImages);
     }
     if (fieldErrors?.images) {
@@ -310,7 +311,6 @@ export const AddProd = () => {
           )}
         </div>
 
-        {/* Colors input (comma-separated) */}
         <div>
           <input
             type="text"
@@ -329,7 +329,6 @@ export const AddProd = () => {
           )}
         </div>
 
-        {/* Sizes input (comma-separated) */}
         <div>
           <input
             type="text"
@@ -344,6 +343,26 @@ export const AddProd = () => {
           {fieldErrors?.sizes && (
             <p className="text-sm txt-r text-red-500 mt-1">
               {fieldErrors.sizes}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="number"
+            name="rating"
+            min={0}
+            max={5}
+            placeholder="Rating"
+            className={`w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-black transition ${
+              fieldErrors?.rating ? "border-red-600" : "border-gray-300"
+            }`}
+            value={formData.rating}
+            onChange={handleChange}
+          />
+          {fieldErrors?.rating && (
+            <p className="text-sm txt-r text-red-500 mt-1">
+              {fieldErrors.rating}
             </p>
           )}
         </div>

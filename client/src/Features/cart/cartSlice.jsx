@@ -1,74 +1,92 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addToCart, getCart, removeFromCart, updateCartQty } from "./cartThunk";
+import { getCartFromCookies, saveCartToCookies } from "../../utils/cartHelper";
+import { fetchCartDetails } from "../products/productThunk";
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    items: [],
+    items: getCartFromCookies(),
     loading: false,
-    error: null,
-    totalQuantity: 0,
-    totalAmount: 0,
   },
   reducers: {
+    addToCart: (state, action) => {
+      const { productId, size, color, quantity } = action.payload;
+
+      if (!productId || !size || !color || !quantity) return;
+
+      const existing = state.items.find(
+        (item) =>
+          item.productId === productId &&
+          item.size === size &&
+          item.color === color
+      );
+
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        state.items.push({ productId, size, color, quantity });
+      }
+
+      saveCartToCookies(state.items);
+    },
+
+    removeFromCart: (state, action) => {
+      const { productId, size, color } = action.payload;
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item.productId === productId &&
+            item.size === size &&
+            item.color === color
+          )
+      );
+      saveCartToCookies(state.items);
+    },
+
+    updateCartQty: (state, action) => {
+      const { productId, size, color, quantity } = action.payload;
+      state.items = state.items.map((item) =>
+        item.productId === productId &&
+        item.size === size &&
+        item.color === color
+          ? { ...item, quantity }
+          : item
+      );
+      saveCartToCookies(state.items);
+    },
+
     clearCart: (state) => {
       state.items = [];
-      state.totalQuantity = 0;
-      state.totalAmount = 0;
+      saveCartToCookies([]);
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(addToCart.pending, (state) => {
+      .addCase(fetchCartDetails.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(addToCart.fulfilled, (state, action) => {
-        state.items = action.payload || [];
+      .addCase(fetchCartDetails.fulfilled, (state, action) => {
+        state.items = action.payload;
+
+        // save minimal info to cookie
+        saveCartToCookies(
+          state.items.map((item) => ({
+            productId: item.productId,
+            size: item.size,
+            color: item.color,
+            quantity: item.quantity,
+          }))
+        );
+
         state.loading = false;
       })
-      .addCase(addToCart.rejected, (state, action) => {
+
+      .addCase(fetchCartDetails.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload?.message || "Error adding to cart";
-      })
-      .addCase(getCart.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getCart.fulfilled, (state, action) => {
-        state.items = action.payload || [];
-        state.loading = false;
-      })
-      .addCase(getCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "Error fetching cart";
-      })
-      .addCase(removeFromCart.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.items = action.payload || [];
-        state.loading = false;
-      })
-      .addCase(removeFromCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "Error removing from cart";
-      })
-      .addCase(updateCartQty.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateCartQty.fulfilled, (state, action) => {
-        state.items = action.payload || [];
-        state.loading = false;
-      })
-      .addCase(updateCartQty.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || "Error updating cart quantity";
       });
   },
 });
 
-export const { clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateCartQty, clearCart } =
+  cartSlice.actions;
 export default cartSlice.reducer;

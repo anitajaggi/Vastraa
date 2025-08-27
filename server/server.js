@@ -12,7 +12,6 @@ import feedbackRoute from "./routes/feedbackRoute.js";
 import subcategoryRoute from "./routes/subcategoryRoute.js";
 import productRoute from "./routes/productRoute.js";
 import wishlistRoutes from "./routes/wishlistRoute.js";
-import cartRoutes from "./routes/cartRoute.js";
 import orderRoutes from "./routes/orderRoute.js";
 
 const app = express();
@@ -42,7 +41,6 @@ app.use("/api/subscribe", subscriberRoute);
 app.use("/api/feedback", feedbackRoute);
 app.use("/api/products", productRoute);
 app.use("/api/wishlist", wishlistRoutes);
-app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
