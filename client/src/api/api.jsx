@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = "https://vastraa-server.onrender.com/api";
+const api = "http://localhost:8080/api";
 
 const axiosApi = axios.create({
   baseURL: api,
